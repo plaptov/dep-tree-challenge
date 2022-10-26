@@ -18,10 +18,9 @@ public class DependenciesService : IDependenciesService
         string platform,
         string project,
         int depth,
-        string version = "latest",
         CancellationToken cancellationToken = default)
     {
-        var response = await GetCached(platform, project, version);
+        var response = await GetCached(platform, project);
         if (depth > 1)
             await FillChidren(response.Dependencies, 1, depth, cancellationToken);
         return response;
@@ -35,39 +34,35 @@ public class DependenciesService : IDependenciesService
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
-            var r = await GetCached(dep.Platform, dep.ProjectName, dep.Latest);
+            var r = await GetCached(dep.Platform, dep.ProjectName);
             dep.Children = r.Dependencies;
             await FillChidren(dep.Children, curDepth + 1, maxDepth, cancellationToken);
         }
     }
 
-    private async Task<DependenciesResponse> GetCached(string platform, string project, string version) =>
+    private async Task<DependenciesResponse> GetCached(string platform, string project) =>
         await _cache.GetOrAdd(
-            new(platform, project, version),
-            key => _webClient.GetDependencies(platform, project, version));
+            new(platform, project),
+            key => _webClient.GetDependencies(platform, project));
 
     private readonly struct CacheKey
     {
-        public CacheKey(string platform, string projectId, string version)
+        public CacheKey(string platform, string projectId)
         {
             Platform = platform;
             ProjectId = projectId;
-            Version = version;
         }
         public string Platform { get; }
         public string ProjectId { get; }
-        public string Version { get; }
 
         public override bool Equals(object? obj)
         {
-            return obj is CacheKey key &&
-                   ProjectId == key.ProjectId &&
-                   Version == key.Version;
+            return obj is CacheKey key && ProjectId == key.ProjectId;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ProjectId, Version);
+            return HashCode.Combine(ProjectId, Platform);
         }
     }
 }

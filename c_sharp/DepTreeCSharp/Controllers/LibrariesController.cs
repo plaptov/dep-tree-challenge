@@ -30,9 +30,8 @@ public class LibrariesController : ControllerBase
         [FromRoute] string platform,
         [FromRoute] string project,
         [FromQuery] int depth = 0,
-        [FromQuery] string version = "latest",
         CancellationToken cancellationToken = default)
     {
-        return await _dependenciesService.GetDependencies(platform, project, depth, version, cancellationToken);
+        return await _dependenciesService.GetDependencies(platform, project, depth, cancellationToken);
     }
 }

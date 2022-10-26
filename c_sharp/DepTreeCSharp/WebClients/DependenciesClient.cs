@@ -13,9 +13,8 @@ public class DependenciesWebClient : WebClientBase, IDependenciesWebClient
     public async Task<DependenciesResponse> GetDependencies(
         string platform,
         string project,
-        string version = "latest",
         CancellationToken cancellationToken = default)
     {
-        return await Get<DependenciesResponse>($"{platform}/{project}/{version}/dependencies", cancellationToken);
+        return await Get<DependenciesResponse>($"{platform}/{project}/latest/dependencies", cancellationToken);
     }
 }

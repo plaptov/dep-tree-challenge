@@ -8,6 +8,5 @@ public interface IDependenciesService
         string platform,
         string project,
         int depth,
-        string version = "latest",
         CancellationToken cancellationToken = default);
 }
